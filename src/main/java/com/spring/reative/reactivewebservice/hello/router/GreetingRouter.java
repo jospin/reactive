@@ -1,4 +1,4 @@
-package com.spring.reative.reactivewebservice.hello.configuration;
+package com.spring.reative.reactivewebservice.hello.router;
 
 import com.spring.reative.reactivewebservice.hello.handler.GreetingHandler;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +15,6 @@ public class GreetingRouter {
 
     @Bean
     public RouterFunction<ServerResponse> route(GreetingHandler greetingHandler) {
-
         return RouterFunctions
                 .route(GET("/hello").and(accept(MediaType.APPLICATION_JSON)), greetingHandler::hello);
     }
