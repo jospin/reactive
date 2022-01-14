@@ -2,7 +2,10 @@ package com.spring.reative.reactivewebservice;
 
 import com.spring.reative.reactivewebservice.hello.model.Customer;
 import com.spring.reative.reactivewebservice.hello.repository.CustomerRepository;
+import com.spring.reative.reactivewebservice.hello.user.model.UserSystem;
+import com.spring.reative.reactivewebservice.hello.user.repository.UserRepository;
 import io.r2dbc.spi.ConnectionFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -18,9 +21,8 @@ import java.time.Duration;
 import java.util.Arrays;
 
 @SpringBootApplication
+@Slf4j
 public class ReactiveWebServiceApplication {
-
-    private static final Logger log = LoggerFactory.getLogger(ReactiveWebServiceApplication.class);
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(ReactiveWebServiceApplication.class, args);
@@ -31,13 +33,13 @@ public class ReactiveWebServiceApplication {
 
         ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();
         initializer.setConnectionFactory(connectionFactory);
-        initializer.setDatabasePopulator(new ResourceDatabasePopulator(new ClassPathResource("schema/customer.sql")));
-
+        initializer.setDatabasePopulator(new ResourceDatabasePopulator(new ClassPathResource("schema/schema.sql")));
+        log.info("---- Create databases ----");
         return initializer;
     }
 
     @Bean
-    public CommandLineRunner demo(CustomerRepository repository) {
+    public CommandLineRunner createCustomer(CustomerRepository repository) {
 
         return (args) -> {
             // save a few customers
@@ -74,6 +76,21 @@ public class ReactiveWebServiceApplication {
                 log.info(bauer.toString());
             }).blockLast(Duration.ofSeconds(10));
             log.info("");
+        };
+    }
+
+    @Bean
+    public CommandLineRunner createUser(UserRepository repository) {
+        return (args) -> {
+            log.info("Save user system");
+            repository.saveAll(
+                    Arrays.asList(new UserSystem("ljospin"))
+            ).blockLast(Duration.ofSeconds(10));
+            log.info("Users found with findAll():");
+            log.info("-------------------------------");
+            repository.findAll().doOnNext(user -> {
+                log.info(user.toString());
+            }).blockLast(Duration.ofSeconds(10));
         };
     }
 }

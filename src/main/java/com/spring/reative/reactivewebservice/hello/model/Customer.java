@@ -1,7 +1,6 @@
 package com.spring.reative.reactivewebservice.hello.model;
 
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
